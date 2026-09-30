@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ area }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#00984F; --verde-osc:#00703A; --verde-claro:#E4F3EA;
+    --negro:#16181A; --gris:#5F6B66; --linea:#E0E6E3; --papel:#FFFFFF; --fondo:#F5F7F6;
+    --temp:#00984F;
+    --ok:#00703A; --error:#C1121F; --espera:#B7791F;
+    --titulo:'Jost','Century Gothic',system-ui,sans-serif;
+    --texto:'Figtree','Segoe UI',system-ui,sans-serif;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0;font-family:var(--texto);color:var(--negro);background:var(--fondo)}
+  button{font:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid var(--verde);outline-offset:2px}
+
+  /* ---------- Cielo ---------- */
+  .cielo{background:radial-gradient(1400px 520px at 50% -60%,#0A3A23,#05190F);
+    color:#fff;text-align:center;padding:2.4rem 1.2rem 2rem;position:relative;overflow:hidden;
+    transition:padding .3s}
+  .cielo.chico{padding:1.2rem}
+  .cielo h1{font-family:var(--titulo);font-weight:600;margin:0;font-size:clamp(1.6rem,5.5vw,2.4rem);letter-spacing:-.02em;position:relative;z-index:2}
+  .cielo p{margin:.4rem 0 0;opacity:.82;font-size:.92rem;position:relative;z-index:2}
+  .cielo.chico h1{font-size:clamp(1.2rem,4vw,1.5rem)}
+  .cielo.chico p{display:none}
+  .estrella{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.55;animation:titila 3.2s infinite}
+  @keyframes titila{50%{opacity:.08}}
+
+  .franja{background:var(--negro);color:#fff;display:flex;justify-content:space-between;align-items:center;
+    gap:.7rem;padding:.45rem 1rem;font-size:.85rem;flex-wrap:wrap}
+  .sello{background:var(--temp);color:#111;border-radius:999px;padding:.15rem .7rem;font-weight:600;white-space:nowrap}
+  .chip{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:.15rem .65rem;font-size:.8rem}
+  .der{display:flex;align-items:center;gap:.6rem}
+
+  main{max-width:1180px;margin:0 auto;padding:1.2rem}
+
+  /* ---------- Mosaico ---------- */
+  .modulos{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .mod{background:var(--papel);border:1px solid var(--linea);border-radius:16px;padding:1.1rem;text-align:left;
+    display:flex;flex-direction:column;gap:.3rem;align-items:flex-start;transition:.2s}
+  .mod:hover{border-color:var(--verde);transform:translateY(-3px);box-shadow:0 14px 28px -14px rgba(0,152,79,.45)}
+  .mod .ico{width:44px;height:44px;border-radius:12px;background:var(--verde-claro);color:var(--verde-osc);
+    display:flex;align-items:center;justify-content:center}
+  .mod .ico svg{width:23px;height:23px}
+  .mod h3{font-family:var(--titulo);font-weight:600;margin:.4rem 0 0;font-size:1.05rem}
+  .mod p{margin:0;font-size:.82rem;color:var(--gris);line-height:1.45}
+  .mod .num{margin-top:.45rem;font-size:.75rem;font-weight:700;color:var(--verde-osc);
+    background:var(--verde-claro);padding:.15rem .6rem;border-radius:999px}
+  .mod .num.alerta{background:#FDECEC;color:var(--error)}
+
+  /* ---------- Vista de módulo ---------- */
+  .volver{background:transparent;border:1px solid var(--linea);border-radius:999px;padding:.4rem 1rem;
+    font-size:.85rem;color:var(--verde-osc);background:var(--papel)}
+  .cabmod{display:flex;align-items:center;gap:.8rem;margin:.9rem 0 1rem;flex-wrap:wrap}
+  .cabmod h2{font-family:var(--titulo);font-weight:600;margin:0;font-size:1.35rem;display:flex;align-items:center;gap:.55rem;color:var(--negro)}
+  .cabmod h2 svg{width:24px;height:24px;color:var(--verde-osc)}
+  .cabmod .der2{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap}
+
+  .tarjeta{background:var(--papel);border:1px solid var(--linea);border-radius:14px;overflow:hidden}
+  .proceso{background:var(--papel);border:1px solid var(--linea);border-left:4px solid var(--verde);
+    border-radius:12px;padding:1rem;margin-bottom:.7rem}
+  .proceso h3{margin:0;font-size:1.02rem;font-weight:600}
+  .proceso p{margin:.25rem 0 .8rem;color:var(--gris);font-size:.88rem}
+  .fila{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+  .btn{border:0;border-radius:8px;padding:.55rem 1.1rem;background:var(--verde-osc);color:#fff;font-weight:600}
+  .btn:hover:not(:disabled){background:var(--verde)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sec{background:var(--papel);color:var(--verde-osc);border:1px solid var(--linea);padding:.38rem .7rem;font-weight:500}
+  .btn.sec:hover{background:var(--verde-claro)}
+  a.btn{text-decoration:none;display:inline-block}
+  .estado{font-size:.85rem;color:var(--gris)}
+  .punto{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.35rem;vertical-align:middle;background:var(--linea)}
+  .punto.ok{background:var(--ok)} .punto.error,.punto.tiempo_agotado{background:var(--error)}
+  .punto.corriendo{background:var(--espera);animation:latir 1s infinite}
+  @keyframes latir{50%{opacity:.25}}
+
+  .consola-cab{display:flex;justify-content:space-between;align-items:center;gap:.5rem;
+    background:var(--negro);color:#fff;padding:.55rem .9rem;border-radius:12px 12px 0 0;flex-wrap:wrap}
+  .consola-cab strong{font-family:var(--titulo);font-weight:500}
+  .consola{background:#0F1214;color:#CFE3D6;border-radius:0 0 12px 12px;padding:.9rem;
+    font-family:Consolas,'Courier New',monospace;font-size:.8rem;line-height:1.55;
+    max-height:60vh;min-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+
+  .migas{display:flex;flex-wrap:wrap;gap:.2rem;font-size:.9rem;margin-bottom:.6rem;align-items:center}
+  .migas>button:not(.btn){border:0;background:none;color:var(--verde-osc);padding:.2rem .3rem;text-decoration:underline}
+  .buscador{width:100%;padding:.6rem .9rem;border:1px solid var(--linea);border-radius:10px;margin-bottom:.6rem;font:inherit;background:var(--papel)}
+  .item{display:grid;grid-template-columns:2.1rem minmax(0,1fr) auto;gap:.7rem;align-items:center;padding:.65rem .85rem;border-top:1px solid var(--linea)}
+  .item:first-child{border-top:0}
+  .item:hover{background:var(--verde-claro)}
+  .item .ic{width:34px;height:34px;border-radius:9px;background:#F1F5F3;color:var(--verde-osc);
+    display:flex;align-items:center;justify-content:center}
+  .item .ic svg{width:19px;height:19px}
+  .item .nom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .meta{font-size:.77rem;color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item button.nom{border:0;background:none;text-align:left;padding:0;color:var(--verde-osc);font-weight:600;width:100%}
+  .acciones{display:flex;gap:.3rem;flex-wrap:wrap;justify-content:flex-end}
+  .vacio{padding:1.5rem;text-align:center;color:var(--gris)}
+  .aviso{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--negro);color:#fff;
+    padding:.7rem 1.1rem;border-radius:8px;font-size:.9rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:120;max-width:90vw}
+  .aviso.ver{opacity:1}
+
+  /* ---------- Ventana emergente ---------- */
+  .fondo-modal{position:fixed;inset:0;background:rgba(6,20,14,.62);display:none;align-items:center;justify-content:center;z-index:100;padding:1rem}
+  .fondo-modal.ver{display:flex}
+  .modal{background:var(--papel);border-radius:16px;width:min(1100px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+  .modal-cab{background:var(--verde-osc);color:#fff;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem}
+  .modal-cab h3{font-family:var(--titulo);font-weight:500;margin:0;font-size:1.05rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .modal-cab button{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:.25rem .7rem}
+  .modal-cuerpo{padding:0;overflow:auto;flex:1;min-height:260px;background:var(--fondo)}
+  .modal-cuerpo iframe{width:100%;height:70vh;border:0;display:block;background:#fff}
+  .modal-cuerpo img{max-width:100%;display:block;margin:0 auto}
+  .modal-cuerpo pre{margin:0;padding:1rem;font-family:Consolas,'Courier New',monospace;font-size:.82rem;white-space:pre-wrap;word-break:break-word}
+  .modal-pie{padding:.75rem 1rem;border-top:1px solid var(--linea);display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;background:var(--papel)}
+  .modal-pie .meta{font-size:.8rem;color:var(--gris);margin-right:auto}
+  .nota{padding:1.6rem;text-align:center;color:var(--gris);line-height:1.6}
+  .form-ejec{padding:1.2rem}
+  .form-ejec p{margin:0 0 .9rem;line-height:1.55}
+  .form-ejec label{display:block;font-weight:600;margin-bottom:.3rem}
+  .form-ejec small{display:block;color:var(--gris);margin-bottom:.4rem;line-height:1.5}
+  .form-ejec textarea{width:100%;min-height:80px;padding:.6rem;border:1px solid var(--linea);
+    border-radius:8px;font-family:Consolas,'Courier New',monospace;font-size:.85rem;resize:vertical}
+  .caja-info{background:var(--verde-claro);border-left:4px solid var(--verde);padding:.75rem .9rem;
+    border-radius:8px;font-size:.88rem;line-height:1.5;margin-bottom:1rem}
+
+  /* ---------- Astronauta ---------- */
+  #bicho{position:fixed;left:0;top:0;z-index:90;pointer-events:none;width:72px;height:72px;
+    transition:transform 2.6s cubic-bezier(.42,0,.35,1)}
+  #bicho .salto{animation:brinca 1.05s ease-in-out infinite;transform-origin:50% 100%}
+  @keyframes brinca{
+    0%,100%{transform:translateY(0) scale(1,1)}
+    14%{transform:translateY(0) scale(1.06,.9)}
+    50%{transform:translateY(-32px) scale(.98,1.02) rotate(-7deg)}
+    86%{transform:translateY(0) scale(1.04,.94)}
+  }
+  #bicho .sombra{position:absolute;left:50%;bottom:-2px;width:40px;height:8px;margin-left:-20px;
+    background:rgba(0,0,0,.18);border-radius:50%;filter:blur(2px);animation:sombrea 1.05s ease-in-out infinite}
+  @keyframes sombrea{50%{transform:scale(.55);opacity:.35}}
+  #adornos{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+  #adornos span{position:absolute;top:-2rem;animation:caer linear forwards;opacity:.7}
+  @keyframes caer{to{transform:translateY(110vh) rotate(360deg)}}
+  header,main{position:relative;z-index:2}
+  @media(prefers-reduced-motion:reduce){ #bicho,#adornos{display:none} }
+</style>
+</head>
+<body>
+<div id="adornos" aria-hidden="true"></div>
+<div id="bicho" aria-hidden="true"></div>
+
+<header>
+  <div class="cielo" id="cielo">
+    <h1>{{ area }}</h1>
+    <p>Elige un módulo para empezar</p>
+  </div>
+  <div class="franja">
+    <span id="reloj"></span>
+    <span class="der">
+      <span class="sello" id="sello"></span>
+      <button class="chip" id="btn-adornos" type="button"></button>
+    </span>
+  </div>
+</header>
+
+<main id="vista"><div class="vacio">Cargando módulos…</div></main>
+
+<div class="fondo-modal" id="fondo-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal-cab"><h3 id="modal-titulo"></h3><button type="button" id="cerrar-modal">Cerrar</button></div>
+    <div class="modal-cuerpo" id="modal-cuerpo"></div>
+    <div class="modal-pie" id="modal-pie"></div>
+  </div>
+</div>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+/* ============================================================
+   TEMPORADAS: cambian el acento y los adornos que caen.
+   Para probar otro mes: agrega ?mes=12 a la URL.
+   ============================================================ */
+const TEMAS = {
+  1:{nombre:"Enero",frase:"Año nuevo, datos en limpio",color:"#BFD9C9",adornos:["✨","🎆","🥂"]},
+  2:{nombre:"Febrero",frase:"Mes de carnaval",color:"#7FD4C1",adornos:["🎭","🎉","🪇"]},
+  3:{nombre:"Marzo",frase:"Mes de la mujer",color:"#E3B7DE",adornos:["🌷","💜","🌸"]},
+  4:{nombre:"Abril",frase:"Mes de la niñez",color:"#F6D96B",adornos:["🎈","🪁","⭐"]},
+  5:{nombre:"Mayo",frase:"Mes de las madres",color:"#F7B6CA",adornos:["🌸","💐","💗"]},
+  6:{nombre:"Junio",frase:"Mes de los padres",color:"#9BD6BE",adornos:["👔","☀️","⚽"]},
+  7:{nombre:"Julio",frase:"Mes de la independencia",color:"#F7D044",adornos:["🇨🇴","💛","⭐"]},
+  8:{nombre:"Agosto",frase:"Feria de las Flores",color:"#F6C453",adornos:["🌼","🌻","🪁","🌺"]},
+  9:{nombre:"Septiembre",frase:"Amor y amistad",color:"#F5B39B",adornos:["💛","💌","🤝","❤️"]},
+  10:{nombre:"Octubre",frase:"Halloween",color:"#F2A25C",adornos:["🎃","🦇","👻","🍬"]},
+  11:{nombre:"Noviembre",frase:"Recta final del año",color:"#D9B38C",adornos:["🍂","🍁","☕"]},
+  12:{nombre:"Diciembre",frase:"Navidad y alumbrados",color:"#8FD6A8",adornos:["🎄","✨","⭐","🎁"]},
+};
+const ROBOT = `<svg viewBox="0 0 64 64" width="72" height="72" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 4.5v7" stroke="#00703A" stroke-width="2.5"/><circle cx="32" cy="4" r="3.5" fill="#00984F"/>
+  <rect x="11" y="11" width="42" height="30" rx="9" fill="#00703A"/>
+  <rect x="17" y="18" width="30" height="16" rx="4" fill="#16181A"/>
+  <rect x="21" y="27" width="4" height="4" rx="1" fill="#00984F"/>
+  <rect x="27" y="24" width="4" height="7" rx="1" fill="#00984F"/>
+  <rect x="33" y="21" width="4" height="10" rx="1" fill="#FFFFFF"/>
+  <rect x="39" y="25" width="4" height="6" rx="1" fill="#00984F"/>
+  <rect x="3" y="18" width="7" height="16" rx="3.5" fill="#00984F"/>
+  <rect x="54" y="18" width="7" height="16" rx="3.5" fill="#00984F"/>
+  <rect x="17" y="43" width="30" height="12" rx="4" fill="#00984F"/>
+  <rect x="27" y="46" width="10" height="6" rx="2" fill="#16181A" opacity=".25"/>
+  <rect x="19" y="55" width="10" height="6" rx="2.5" fill="#00703A"/>
+  <rect x="35" y="55" width="10" height="6" rx="2.5" fill="#00703A"/></svg>`;
+
+const $ = s => document.querySelector(s);
+const mes = Math.min(12, Math.max(1, parseInt(new URLSearchParams(location.search).get("mes")) || new Date().getMonth() + 1));
+const T = TEMAS[mes];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TXT_ESTADO = {ok:"Terminó bien", error:"Terminó con error", corriendo:"Ejecutando…", tiempo_agotado:"Cancelado por tiempo"};
+function aviso(t){ const a = $("#aviso"); a.textContent = t; a.classList.add("ver"); setTimeout(() => a.classList.remove("ver"), 3500); }
+async function api(url, opts){
+  const r = await fetch(url, opts);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || `Error ${r.status}`);
+  return d;
+}
+function tamano(b){ if (b == null) return ""; const u = ["B","KB","MB","GB"]; let i = 0; while (b >= 1024 && i < 3){ b /= 1024; i++; } return b.toFixed(i ? 1 : 0) + " " + u[i]; }
+/* ---------- Iconos dibujados (verde de marca, sin emojis) ---------- */
+function svg(d){
+  return `<svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+    stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true">${d}</svg>`;
+}
+const ICO = {
+  engranaje: svg(`<circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5v.2a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1h.2a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>`),
+  carpeta:   svg(`<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h7A1.5 1.5 0 0 1 19 10v7.5A1.5 1.5 0 0 1 17.5 19h-13A1.5 1.5 0 0 1 3 17.5z"/>`),
+  carpetaAb: svg(`<path d="M3 8V6.5A1.5 1.5 0 0 1 4.5 5h4l2 2.5h7A1.5 1.5 0 0 1 19 9v1"/><path d="M3 8h17.2a1 1 0 0 1 1 1.2l-1.6 8A1.5 1.5 0 0 1 18.1 19H4.5A1.5 1.5 0 0 1 3 17.5z"/>`),
+  monitor:   svg(`<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="M6.5 8.5l2.5 2.5-2.5 2.5M11.5 13.5h5"/>`),
+  reloj:     svg(`<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>`),
+  grafico:   svg(`<path d="M3.5 20.5h17"/><rect x="5" y="12" width="3.6" height="6"/><rect x="10.2" y="8" width="3.6" height="10"/><rect x="15.4" y="4.5" width="3.6" height="13.5"/>`),
+  bd:        svg(`<ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/>`),
+  archivo:   svg(`<path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19"/>`),
+  script:    svg(`<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 8.5h18"/><path d="M7 12.5l2 2-2 2M11.5 16.5h5"/>`),
+  hoja:      svg(`<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M3.5 15h17M9 4v16M15 4v16"/>`),
+  python:    svg(`<path d="M12 3c-3 0-4.5 1-4.5 3v2.5H12v1H6.5C4.5 9.5 3.5 11 3.5 13.5S4.5 17.5 6.5 17.5H8v-2.8c0-1.7 1.3-3 3-3h3.5c1.5 0 2.5-1 2.5-2.5V6c0-2-1.5-3-5-3z"/><path d="M12 21c3 0 4.5-1 4.5-3v-2.5H12v-1h5.5c2 0 3-1.5 3-4s-1-4-3-4H16v2.8c0 1.7-1.3 3-3 3H9.5C8 12.3 7 13.3 7 14.8V18c0 2 1.5 3 5 3z"/>`),
+  imagen:    svg(`<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="8.8" cy="9.8" r="1.6"/><path d="M4 17l4.8-4.5 3.4 3 3-2.6L20 17"/>`),
+  pdf:       svg(`<path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19"/><path d="M8.5 16.5c3-1 5-4.5 4.2-6-0.8-1.4-2 1.4 0 4 1.5 2 3.5 2.4 4.3 2"/>`),
+  zip:       svg(`<path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19"/><path d="M10 4v2m2 1v2m-2 1v2m2 1v2"/>`),
+};
+function icono(n, carpeta){
+  if (carpeta) return ICO.carpeta;
+  const e = String(n).split(".").pop().toLowerCase();
+  if (["bat","cmd"].includes(e)) return ICO.script;
+  if (e === "pbix") return ICO.grafico;
+  if (["xlsx","xlsm","xls","csv","tsv"].includes(e)) return ICO.hoja;
+  if (e === "py") return ICO.python;
+  if (e === "pdf") return ICO.pdf;
+  if (["png","jpg","jpeg","gif","webp","bmp","svg"].includes(e)) return ICO.imagen;
+  if (["zip","rar","7z"].includes(e)) return ICO.zip;
+  return ICO.archivo;
+}
+
+/* ---------- Ambiente ---------- */
+function estrellas(){
+  const c = $("#cielo");
+  for (let i = 0; i < 34; i++){
+    const s = document.createElement("i"); s.className = "estrella";
+    s.style.left = Math.random()*100+"%"; s.style.top = Math.random()*100+"%";
+    s.style.animationDelay = (Math.random()*3.2)+"s"; c.appendChild(s);
+  }
+}
+let animOn = localStorage.getItem("adornos") !== "no", timerAdornos = null;
+function lanzarAdorno(){
+  const s = document.createElement("span");
+  s.textContent = T.adornos[Math.floor(Math.random()*T.adornos.length)];
+  s.style.left = Math.random()*100+"vw";
+  s.style.fontSize = (0.9 + Math.random()*1.1)+"rem";
+  const d = 9 + Math.random()*8; s.style.animationDuration = d+"s";
+  $("#adornos").appendChild(s); setTimeout(() => s.remove(), d*1000);
+}
+let timerSalto = null, bichoX = 0, bichoY = 0;
+function saltarAlAzar(){
+  const b = $("#bicho"); if (!b || !animOn) return;
+  const ancho = window.innerWidth - 80, alto = window.innerHeight - 90;
+  // no repite zona: se va siempre a un punto lejano del actual
+  let x, y, intentos = 0;
+  do{
+    x = 20 + Math.random() * Math.max(60, ancho);
+    y = 40 + Math.random() * Math.max(60, alto);
+    intentos++;
+  } while (intentos < 12 && Math.hypot(x - bichoX, y - bichoY) < window.innerWidth * 0.3);
+  const mirando = x < bichoX ? -1 : 1;
+  bichoX = x; bichoY = y;
+  b.style.transform = `translate(${x}px, ${y}px) scaleX(${mirando})`;
+}
+function actualizarAnim(){
+  $("#btn-adornos").textContent = animOn ? "Quitar adornos" : "Poner adornos";
+  const b = $("#bicho");
+  clearInterval(timerSalto); clearInterval(timerAdornos);
+  if (animOn){
+    b.innerHTML = `<div class="sombra"></div><div class="salto">${ROBOT}</div>`;
+    bichoX = window.innerWidth * 0.15; bichoY = window.innerHeight * 0.7;
+    b.style.transform = `translate(${bichoX}px, ${bichoY}px)`;
+    setTimeout(saltarAlAzar, 600);
+    timerSalto = setInterval(saltarAlAzar, 3000);
+    timerAdornos = setInterval(lanzarAdorno, 1600);
+  } else {
+    b.innerHTML = ""; $("#adornos").innerHTML = "";
+  }
+}
+window.addEventListener("resize", () => {
+  bichoX = Math.min(bichoX, window.innerWidth - 80);
+  bichoY = Math.min(bichoY, window.innerHeight - 90);
+});
+$("#btn-adornos").onclick = () => { animOn = !animOn; localStorage.setItem("adornos", animOn ? "si" : "no"); actualizarAnim(); };
+function reloj(){ $("#reloj").textContent = new Date().toLocaleString("es-CO",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}); }
+
+/* ---------- Estado ---------- */
+let CFG = {carpetas:[]}, PROCESOS = [], HISTORIAL = [];
+let moduloActual = null, raizActual = null, rutaActual = "", datosArch = null, filtro = "";
+let tareaActual = null, lineasVistas = 0, sondeo = null, lineasConsola = "", tituloConsola = "Consola", estadoConsola = "";
+let ejecPendiente = null;
+
+const FIJOS = [
+  {id:"proc", ico:ICO.engranaje, t:"Procesos",  d:"Lanza los procesos del área con un botón"},
+  {id:"cons", ico:ICO.monitor,   t:"Consola",   d:"Salida en vivo del proceso que está corriendo"},
+  {id:"hist", ico:ICO.reloj,     t:"Historial", d:"Quién ejecutó qué, cuándo y con qué resultado"},
+];
+function iconoCarpeta(nombre, ejecutable){
+  const n = nombre.toLowerCase();
+  if (n.includes("bi") || n.includes("informe")) return ICO.grafico;
+  if (n.includes("bd") || n.includes("base"))    return ICO.bd;
+  return ejecutable ? ICO.carpetaAb : ICO.carpeta;
+}
+function modulos(){
+  const carpetas = CFG.carpetas.map(c => ({
+    id:"carp:" + c.nombre, ico:iconoCarpeta(c.nombre, c.ejecutar), t:c.nombre,
+    d:c.ejecutar ? "Explora y ejecuta los .bat de esta carpeta" : "Explora y descarga los archivos",
+    n:c.ejecutar ? "ejecutable" : "solo lectura"
+  }));
+  const corriendo = PROCESOS.filter(p => p.corriendo).length;
+  const fallidos = HISTORIAL.filter(h => h.estado !== "ok").length;
+  return [
+    {...FIJOS[0], n: corriendo ? corriendo + " corriendo" : PROCESOS.length + " disponibles"},
+    ...carpetas,
+    {...FIJOS[1], n: tareaActual ? "en vivo" : (estadoConsola || "en reposo")},
+    {...FIJOS[2], n: HISTORIAL.length + " registros", alerta: fallidos > 0},
+  ];
+}
+
+/* ---------- Navegación ---------- */
+function irA(id){
+  moduloActual = id;
+  $("#cielo").classList.toggle("chico", !!id);
+  if (!id) return pintarMosaico();
+  if (id === "proc") return pintarProcesos();
+  if (id === "cons") return pintarConsola();
+  if (id === "hist") return pintarHistorial();
+  if (id.startsWith("carp:")){
+    raizActual = id.slice(5); rutaActual = ""; filtro = "";
+    return explorar(raizActual, "");
+  }
+}
+function cabecera(ico, titulo, extra = ""){
+  return `<div class="cabmod"><button class="volver" data-ir-inicio>← Módulos</button>
+    <h2>${ico} ${esc(titulo)}</h2><span class="der2">${extra}</span></div>`;
+}
+function pintarMosaico(){
+  $("#vista").innerHTML = `<div class="modulos">` + modulos().map(m => `
+    <button class="mod" data-mod="${esc(m.id)}"><span class="ico">${m.ico}</span>
+      <h3>${esc(m.t)}</h3><p>${esc(m.d)}</p>
+      <span class="num${m.alerta ? " alerta" : ""}">${esc(m.n)}</span></button>`).join("") + `</div>`;
+}
+
+/* ---------- Módulo Procesos ---------- */
+async function pintarProcesos(){
+  $("#vista").innerHTML = cabecera(ICO.engranaje,"Procesos") + `<div id="lp"><div class="vacio">Cargando…</div></div>`;
+  try{
+    PROCESOS = await api("/api/scripts");
+    if (!PROCESOS.length){ $("#lp").innerHTML = `<div class="vacio tarjeta">No hay procesos destacados. Usa los módulos de carpetas para ejecutar los .bat.</div>`; return; }
+    $("#lp").innerHTML = PROCESOS.map(p => {
+      const est = p.corriendo ? "corriendo" : (p.ultima?.estado || "");
+      const txt = p.corriendo ? TXT_ESTADO.corriendo
+                : p.ultima ? `${TXT_ESTADO[p.ultima.estado]} el ${p.ultima.fin}` : "Sin ejecuciones recientes";
+      return `<article class="proceso"><h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p>
+        <div class="fila">
+          <button class="btn" data-run="${esc(p.id)}" data-nombre="${esc(p.nombre)}" ${p.corriendo || !p.existe ? "disabled" : ""}>Ejecutar</button>
+          ${p.corriendo ? `<button class="btn sec" data-ver="${esc(p.corriendo)}" data-nombre="${esc(p.nombre)}">Ver consola</button>` : ""}
+          <span class="estado"><span class="punto ${est}"></span>${p.existe ? txt : "No se encuentra el .bat, revisa la ruta en config.py"}</span>
+        </div></article>`;
+    }).join("");
+  }catch(e){ $("#lp").innerHTML = `<div class="vacio tarjeta">${esc(e.message)}</div>`; }
+}
+
+/* ---------- Módulo Consola ---------- */
+function pintarConsola(){
+  $("#vista").innerHTML = cabecera(ICO.monitor,"Consola",
+    `<button class="btn sec" id="limpiar">Limpiar</button>`) +
+    `<div class="consola-cab"><strong id="consola-titulo">${esc(tituloConsola)}</strong>
+       <span class="estado" id="consola-estado" style="color:#CFE3D6">${estadoConsola ? `<span class="punto ${estadoConsola}"></span>${TXT_ESTADO[estadoConsola]}` : ""}</span></div>
+     <div class="consola" id="consola">${esc(lineasConsola) || "Ejecuta un proceso para ver su salida aquí."}</div>`;
+  const c = $("#consola"); c.scrollTop = c.scrollHeight;
+  $("#limpiar").onclick = () => { lineasConsola = ""; $("#consola").textContent = "Consola limpia."; };
+}
+function seguir(tid, nombre){
+  tareaActual = tid; lineasVistas = 0; lineasConsola = ""; tituloConsola = nombre; estadoConsola = "corriendo";
+  irA("cons");
+  clearInterval(sondeo); sondeo = setInterval(consultarTarea, 1000); consultarTarea();
+}
+async function consultarTarea(){
+  if (!tareaActual) return;
+  try{
+    const t = await api(`/api/tarea/${tareaActual}?desde=${lineasVistas}`);
+    if (t.salida.length){
+      lineasConsola += (lineasVistas ? "\n" : "") + t.salida.join("\n");
+      lineasVistas = t.total;
+      const c = $("#consola");
+      if (c){ c.textContent = lineasConsola; c.scrollTop = c.scrollHeight; }
+    }
+    estadoConsola = t.estado;
+    const e = $("#consola-estado");
+    if (e) e.innerHTML = `<span class="punto ${t.estado}"></span>${TXT_ESTADO[t.estado]}`;
+    if (t.estado !== "corriendo"){
+      clearInterval(sondeo); tareaActual = null;
+      aviso(`${t.nombre}: ${TXT_ESTADO[t.estado].toLowerCase()}`);
+      cargarHistorial();
+    }
+  }catch(e){ clearInterval(sondeo); }
+}
+
+/* ---------- Módulo Historial ---------- */
+async function cargarHistorial(){ try{ HISTORIAL = await api("/api/historial"); }catch(e){} }
+async function pintarHistorial(){
+  await cargarHistorial();
+  $("#vista").innerHTML = cabecera(ICO.reloj,"Historial") + (HISTORIAL.length
+    ? `<div class="tarjeta">` + HISTORIAL.map(x => `<div class="item">
+        <span class="ic"><span class="punto ${x.estado}" style="margin:0"></span></span>
+        <div style="min-width:0"><div class="nom">${esc(x.nombre)}</div>
+          <div class="meta">${esc(x.inicio)} · lanzado desde ${esc(x.ip)}</div></div>
+        <span class="meta">${TXT_ESTADO[x.estado]}</span></div>`).join("") + `</div>`
+    : `<div class="vacio tarjeta">Aún no hay ejecuciones desde que se inició la página.</div>`);
+}
+
+/* ---------- Módulo Carpeta ---------- */
+async function explorar(raiz, ruta){
+  raizActual = raiz; rutaActual = ruta;
+  $("#vista").innerHTML = cabecera(iconoCarpeta(raiz, true), raiz) + `<div class="vacio">Cargando…</div>`;
+  try{
+    datosArch = await api(`/api/explorar?raiz=${encodeURIComponent(raiz)}&ruta=${encodeURIComponent(ruta)}`);
+    pintarCarpeta();
+  }catch(e){ $("#vista").innerHTML = cabecera(iconoCarpeta(raiz, true), raiz) + `<div class="vacio tarjeta">${esc(e.message)}</div>`; }
+}
+function pintarCarpeta(){
+  const d = datosArch, partes = d.ruta ? d.ruta.split("/") : [];
+  const extra = `<button class="btn sec" data-copiar="${esc(d.ruta_completa)}">Copiar ruta</button>`
+              + (CFG.abrir ? `<button class="btn sec" data-abrir="">Abrir carpeta</button>` : "");
+  const migas = d.plano
+    ? `<span style="color:var(--gris)">${esc(d.raiz)} · todas las subcarpetas</span>`
+    : `<button data-ir="">${esc(d.raiz)}</button>` + partes.map((p,i) => ` / <button data-ir="${esc(partes.slice(0,i+1).join("/"))}">${esc(p)}</button>`).join("");
+  const q = filtro.trim().toLowerCase();
+  const items = q ? d.items.filter(i => i.nombre.toLowerCase().includes(q) || (i.subcarpeta||"").toLowerCase().includes(q)) : d.items;
+  const lista = items.length ? `<div class="tarjeta">` + items.map(it => {
+      const qs = `raiz=${encodeURIComponent(d.raiz)}&ruta=${encodeURIComponent(it.ruta)}`;
+      const meta = (it.subcarpeta ? it.subcarpeta + " · " : "") + it.modificado + (it.carpeta ? "" : " · " + tamano(it.tamano));
+      const nombre = it.carpeta ? `<button class="nom" data-ir="${esc(it.ruta)}">${esc(it.nombre)}</button>`
+        : (it.vista ? `<button class="nom" data-modal="${esc(it.ruta)}">${esc(it.nombre)}</button>` : `<div class="nom">${esc(it.nombre)}</div>`);
+      const acc = it.carpeta ? "" : `
+        ${it.bat && d.ejecutar ? `<button class="btn sec" data-ejecutar="${esc(it.ruta)}">Ejecutar</button>` : ""}
+        <a class="btn sec" href="/api/descargar?${qs}">Descargar</a>
+        ${CFG.abrir ? `<button class="btn sec" data-abrir="${esc(it.ruta)}">Abrir</button>` : ""}`;
+      return `<div class="item"><span class="ic">${icono(it.nombre, it.carpeta)}</span>
+        <div style="min-width:0">${nombre}<div class="meta">${esc(meta)}</div></div>
+        <div class="acciones">${acc}</div></div>`;
+    }).join("") + `</div>`
+    : `<div class="vacio tarjeta">${q ? "Ningún archivo coincide." : "Esta carpeta está vacía."}</div>`;
+  $("#vista").innerHTML = cabecera(iconoCarpeta(d.raiz, d.ejecutar), d.raiz, extra)
+    + `<div class="migas">${migas}</div>`
+    + `<input class="buscador" id="buscador" type="search" placeholder="Buscar por nombre…" value="${esc(filtro)}" autocomplete="off">`
+    + lista;
+  const b = $("#buscador");
+  b.addEventListener("input", () => { filtro = b.value; const p = b.selectionStart; pintarCarpeta(); const n = $("#buscador"); n.focus(); n.setSelectionRange(p,p); });
+}
+
+/* ---------- Ventana emergente ---------- */
+function cerrarModal(){ ejecPendiente = null; $("#fondo-modal").classList.remove("ver"); $("#modal-cuerpo").innerHTML = ""; $("#modal-pie").innerHTML = ""; }
+$("#cerrar-modal").onclick = cerrarModal;
+$("#fondo-modal").addEventListener("click", e => { if (e.target.id === "fondo-modal") cerrarModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarModal(); });
+
+async function abrirModal(ruta){
+  const q = `raiz=${encodeURIComponent(raizActual)}&ruta=${encodeURIComponent(ruta)}`;
+  $("#modal-titulo").textContent = ruta.split("/").pop();
+  $("#modal-cuerpo").innerHTML = '<div class="nota">Cargando…</div>';
+  $("#modal-pie").innerHTML = ""; $("#fondo-modal").classList.add("ver");
+  try{
+    const d = await api(`/api/vista?${q}`);
+    let cuerpo;
+    if (d.tipo === "powerbi"){
+      cuerpo = d.url_bi ? `<iframe src="${esc(d.url_bi)}" allowfullscreen></iframe>`
+        : `<div class="nota"><strong>Informe de Power BI</strong><br><br>
+            Este archivo .pbix no se puede ver dentro del navegador: solo lo abre Power BI Desktop.<br>
+            Descárgalo para abrirlo, o publícalo en Power BI Service y agrega su enlace en
+            <code>INFORMES_POWER_BI</code> del config.py para verlo aquí mismo.</div>`;
+    } else if (d.tipo === "imagen") cuerpo = `<img src="/api/descargar?${q}&inline=1" alt="${esc(d.nombre)}">`;
+    else if (d.tipo === "marco")  cuerpo = `<iframe src="/api/descargar?${q}&inline=1"></iframe>`;
+    else if (d.tipo === "texto")  cuerpo = `<pre>${esc(d.contenido)}</pre>`;
+    else cuerpo = `<div class="nota">Este tipo de archivo no se puede previsualizar. Descárgalo para abrirlo.</div>`;
+    $("#modal-cuerpo").innerHTML = cuerpo;
+    $("#modal-pie").innerHTML = `<span class="meta">${esc(d.modificado)} · ${tamano(d.tamano)}</span>
+      <a class="btn" href="/api/descargar?${q}">Descargar</a>
+      <button class="btn sec" data-copiar="${esc(d.ruta_completa)}">Copiar ruta</button>`;
+  }catch(e){ $("#modal-cuerpo").innerHTML = `<div class="nota">${esc(e.message)}</div>`; }
+}
+
+function ventanaEjecutar(ruta){
+  ejecPendiente = ruta;
+  $("#modal-titulo").textContent = "Ejecutar " + ruta.split("/").pop();
+  $("#modal-cuerpo").innerHTML = `<div class="form-ejec">
+      <div class="caja-info">Este proceso se ejecuta en el equipo donde está publicada la página,
+        con sus permisos de red. En tu PC no se abre ninguna ventana: la salida aparece aquí mismo.</div>
+      <p>Archivo: <strong>${esc(ruta)}</strong></p>
+      <label for="entrada-ejec">Respuestas para el menú (opcional)</label>
+      <small>Si el proceso pregunta algo al arrancar, escribe aquí las respuestas, una por línea,
+        en el orden en que las pide. Si no pregunta nada, déjalo vacío.</small>
+      <textarea id="entrada-ejec" placeholder="Ejemplo:&#10;2"></textarea></div>`;
+  $("#modal-pie").innerHTML = `<span class="meta">Se registra quién lo ejecutó</span>
+    <button class="btn sec" id="cancelar-ejec">Cancelar</button>
+    <button class="btn" id="confirmar-ejec">Ejecutar ahora</button>`;
+  $("#fondo-modal").classList.add("ver");
+  setTimeout(() => $("#entrada-ejec")?.focus(), 50);
+  $("#cancelar-ejec").onclick = cerrarModal;
+  $("#confirmar-ejec").onclick = confirmarEjecucion;
+}
+async function confirmarEjecucion(){
+  if (!ejecPendiente) return;
+  const ruta = ejecPendiente, nombre = ruta.split("/").pop();
+  const entrada = ($("#entrada-ejec")?.value || "").replace(/\r/g, "");
+  const b = $("#confirmar-ejec"); b.disabled = true; b.textContent = "Lanzando…";
+  try{
+    const d = await api("/api/ejecutar_archivo", {method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({raiz:raizActual, ruta, entrada})});
+    ejecPendiente = null; cerrarModal(); seguir(d.tarea, nombre);
+  }catch(err){ aviso(err.message); b.disabled = false; b.textContent = "Ejecutar ahora"; }
+}
+
+/* ---------- Clics ---------- */
+document.addEventListener("click", async e => {
+  const mod = e.target.closest("[data-mod]"), inicio = e.target.closest("[data-ir-inicio]"),
+        ir = e.target.closest("[data-ir]"), cop = e.target.closest("[data-copiar]"),
+        abr = e.target.closest("[data-abrir]"), eje = e.target.closest("[data-ejecutar]"),
+        vis = e.target.closest("[data-modal]"), run = e.target.closest("[data-run]"),
+        ver = e.target.closest("[data-ver]");
+  if (mod) irA(mod.dataset.mod);
+  if (inicio) irA(null);
+  if (ir){ filtro = ""; explorar(raizActual, ir.dataset.ir); }
+  if (vis) abrirModal(vis.dataset.modal);
+  if (eje) ventanaEjecutar(eje.dataset.ejecutar);
+  if (ver) { tituloConsola = ver.dataset.nombre; seguir(ver.dataset.ver, ver.dataset.nombre); }
+  if (run){
+    if (!confirm(`¿Ejecutar "${run.dataset.nombre}"?`)) return;
+    try{ const d = await api(`/api/ejecutar/${run.dataset.run}`, {method:"POST"}); seguir(d.tarea, run.dataset.nombre); }
+    catch(err){ aviso(err.message); }
+  }
+  if (cop){
+    try{ await navigator.clipboard.writeText(cop.dataset.copiar); aviso("Ruta copiada: pégala en la barra del Explorador de Windows"); }
+    catch{ prompt("Copia esta ruta:", cop.dataset.copiar); }
+  }
+  if (abr){
+    try{ await api("/api/abrir", {method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({raiz:raizActual, ruta:abr.dataset.abrir || rutaActual})}); }
+    catch(err){ aviso(err.message); }
+  }
+});
+
+/* ---------- Arranque ---------- */
+async function arrancar(){
+  document.documentElement.style.setProperty("--temp", T.color);
+  $("#sello").textContent = `${T.nombre} · ${T.frase}`;
+  estrellas(); actualizarAnim(); reloj(); setInterval(reloj, 30000);
+  try{ CFG = await api("/api/config"); }catch(e){}
+  try{ PROCESOS = await api("/api/scripts"); }catch(e){}
+  await cargarHistorial();
+  irA(null);
+  setInterval(async () => {
+    if (tareaActual) return;
+    try{ PROCESOS = await api("/api/scripts"); }catch(e){}
+    if (!moduloActual) pintarMosaico();
+  }, 20000);
+}
+arrancar();
+</script>
+</body>
+</html>
