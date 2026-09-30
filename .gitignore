@@ -1,0 +1,15 @@
+# Configuración local (rutas reales)
+.env
+
+# Log de ejecuciones: queda con IPs y nombres de scripts reales
+ejecuciones.log
+
+# Archivos temporales de Windows
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
